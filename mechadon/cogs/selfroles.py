@@ -1,10 +1,16 @@
 import discord
-from discord.ext import commands, errors
+from discord.ext import commands
 
 class SelfRoles:
 
     def __init__(self, bot):
         self.bot = bot
+
+    async def toggle_role(bot, user, role):
+        if role in user.roles:
+            await bot.remove_roles(user, role)
+        else:
+            await bot.add_roles(user, role)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['register'])
     async def role(self, context, *, asked_role : str):
@@ -19,13 +25,9 @@ class SelfRoles:
         if not found:
             raise Exception('The asked role does not exist on this server')
 
-        user = context.message.author
         try:
-            if found in user.roles:
-                await self.bot.remove_roles(user, found)
-            else:
-                await self.bot.add_roles(user, found)
-        except errors.CommandInvokeError as e:
+            toggle_role(self.bot, conext.message.author, found)
+        except discord.errors.CommandInvokeError as e:
             if e.status == 403:
                 raise Exception('The asked role is not self-assignable')
             else:
