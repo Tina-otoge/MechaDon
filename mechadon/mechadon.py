@@ -9,7 +9,7 @@ class MechaDon(commands.Bot):
 
         self.add_cog(cogs.SelfRoles(self))
 
-        DBInterface.db_file = config.db_file
+        DBInterface.db_path = config.db_path
         with open('init.sql') as f:
             with DBInterface() as db:
                 db.execute(f.read())
