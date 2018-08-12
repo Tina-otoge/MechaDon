@@ -1,3 +1,6 @@
+# DB
+*.db
+
 # Config
 /config.py
 
