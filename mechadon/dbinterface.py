@@ -16,3 +16,15 @@ class DBInterface():
 
     def execute(self, sql):
         self.cursor.executescript(sql)
+
+    def get_by_id(table=None, id_, columns='*'):
+        if table is None:
+            raise ValueError('table can not be None')
+
+        if columns != '*':
+            columns = ', '.join('`{}`'.format(column) for column in columns)
+
+        sql = 'SELECT {} FROM {} WHERE `id`=?'.format(columns, table)
+        self.cursor.execute(sql, tuple(id_))
+
+        return self.cursor.fetchone()
