@@ -19,6 +19,9 @@ class DBInterface():
 
     @staticmethod
     def list_to_sql(list_, setter=False):
+        if list_ == '*':
+            return list_
+
         format_ = '`{}`'
 
         if setter:
@@ -32,20 +35,34 @@ class DBInterface():
     def commit(self):
         self.connection.commit()
 
+    def get_by(self, table, data_find, columns='*'):
+        columns = DBInterface.list_to_sql(columns)
+        cond    = DBInterface.list_to_sql(data_find.keys(), setter=True)
+        params  = tuple(data_find.values())
+        sql     = 'SELECT {} FROM {} WHERE {}'.format(columns, table, cond)
+        self.cursor.execute(sql, params)
+
+        return self.cursor.fetchall()
+
+    def set_by(self, table, data_find, data_new):
+        columns = DBInterface.list_to_sql(data_new.keys(), setter=True)
+        cond    = DBInterface.list_to_sql(data_find.keys(), setter=True)
+        params  = list(data_new.values())
+        params.extend(list(data_find.values()))
+        sql     = 'UPDATE {} SET {} WHERE {}'.format(table, columns, cond)
+
+        return self.cursor.execute(sql, params)
+
     def get_by_id(self, table, id_, columns='*'):
-        if columns != '*':
-            columns = DBInterface.list_to_sql(columns)
+        return self.get_by(table, {'id': id_}, columns)
 
-        sql = 'SELECT {} FROM {} WHERE `id`=?'.format(columns, table)
-        self.cursor.execute(sql, (id_,))
+    def set_by_id(self, table, id_, data_new):
+        if len(self.get_by_id(table, id_, ['id'])) == 0:
+            self.insert_id(table, id_)
+            print('inserted')
+        return self.set_by(table, {'id': id_}, data_new)
 
-        return self.cursor.fetchone()
+    def insert_id(self, table, id_):
+        sql = 'INSERT INTO {}(`id`) VALUES (?)'.format(table)
 
-    def set_by_id(self, table, id_, dictionary):
-        sql = 'UPDATE {} SET {} WHERE `id`=?'.format(
-                table, DBInterface.list_to_sql(dictionary, setter=True))
-
-        values = list(dictionary.values())
-        values.append(id_)
-
-        return self.cursor.execute(sql, tuple(values))
+        return self.cursor.execute(sql, (id_,))
