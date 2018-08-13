@@ -1,12 +1,19 @@
 import sqlite3
 
+class DebugRow(sqlite3.Row):
+    def __repr__(self):
+        key_values = []
+        for key in self.keys():
+            key_values.append('\'{}\': {}'.format(key, str(self[key])))
+        return '<DebugRow: {{{}}}>'.format(', '.join(key_values))
+
 class DBInterface():
 
     db_path = None
 
     def __init__(self):
         connection             = sqlite3.connect(self.db_path)
-        connection.row_factory = sqlite3.Row
+        connection.row_factory = DebugRow
 
         self.connection = connection
         self.cursor     = self.connection.cursor()
