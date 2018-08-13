@@ -1,12 +1,19 @@
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE IF NOT EXISTS `birthdays` (
   `id` VARCHAR(18) NOT NULL,
-  `super_admin` INTEGER(1) DEFAULT 0,
-  `birthday` TEXT
+  `date` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `servers` (
   `id` VARCHAR(18) NOT NULL,
-	`selfroles` TEXT,
-  `bot_admins` TEXT,
   `birthday_channel` VARCHAR(18)
+);
+
+CREATE TABLE IF NOT EXISTS `selfroles` (
+	`id` VARCHAR(18) NOT NULL,
+	`server_id` VARCHAR(18) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `bot_admins` (
+	`id` VARCHAR(18) NOT NULL,
+	`server_id` VARCHAR(18)
 );
