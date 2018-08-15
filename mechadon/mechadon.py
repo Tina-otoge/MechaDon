@@ -1,19 +1,21 @@
 from discord.ext import commands
-from .ext import cogs
+
+from .ext         import cogs
 from .dbinterface import DBInterface
-from .mechaembed import MechaEmbed
+from .mechaembed  import MechaEmbed
 
 class MechaDon(commands.Bot):
 
     def __init__(self, config):
+        self.db_path = config.db_path
+
         super().__init__(command_prefix=commands.when_mentioned_or('!'))
 
         for cog in cogs:
             self.add_cog(cog(self))
 
-        DBInterface.db_path = config.db_path
         with open('init.sql') as f:
-            with DBInterface() as db:
+            with self.db_interface() as db:
                 db.execute(f.read())
 
         self.run(config.token)
@@ -24,3 +26,6 @@ class MechaDon(commands.Bot):
 
     def create_embed(self, **kwargs):
         return MechaEmbed(**kwargs)
+
+    def db_interface(self):
+        return DBInterface(self.db_path)
