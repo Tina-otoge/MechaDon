@@ -5,14 +5,18 @@ class DebugRow(sqlite3.Row):
         key_values = []
         for key in self.keys():
             key_values.append('\'{}\': {}'.format(key, str(self[key])))
+
         return '<DebugRow: {{{}}}>'.format(', '.join(key_values))
 
 class DBInterface():
 
     db_path = None
 
-    def __init__(self):
-        connection             = sqlite3.connect(self.db_path)
+    def __init__(self, path=None):
+        if path is None:
+            path = self.db_path
+
+        connection             = sqlite3.connect(path)
         connection.row_factory = DebugRow
 
         self.connection = connection
@@ -67,6 +71,7 @@ class DBInterface():
         if len(self.get_by_id(table, id_, ['id'])) == 0:
             self.insert_id(table, id_)
             print('inserted')
+
         return self.set_by(table, {'id': id_}, data_new)
 
     def insert_id(self, table, id_):
