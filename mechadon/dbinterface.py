@@ -29,6 +29,10 @@ class DBInterface():
         self.connection.close()
 
     @staticmethod
+    def list_to_sql_vars(list_):
+        return ', '.join('?' for element in list_)
+
+    @staticmethod
     def list_to_sql(list_, setter=False):
         if list_ == '*':
             return list_
@@ -45,12 +49,18 @@ class DBInterface():
 
     def commit(self):
         self.connection.commit()
+    
+    def get(self, table, columns='*'):
+        columns = DBInterface.list_to_sql(columns)
+        sql     = 'SELECT {} FROM `{}`'.format(columns, table)
+        self.cursor.execute(sql)
 
+        return self.cursor.fetchall()
     def get_by(self, table, data_find, columns='*'):
         columns = DBInterface.list_to_sql(columns)
         cond    = DBInterface.list_to_sql(data_find.keys(), setter=True)
         params  = tuple(data_find.values())
-        sql     = 'SELECT {} FROM {} WHERE {}'.format(columns, table, cond)
+        sql     = 'SELECT {} FROM `{}` WHERE {}'.format(columns, table, cond)
         self.cursor.execute(sql, params)
 
         return self.cursor.fetchall()
@@ -60,7 +70,14 @@ class DBInterface():
         cond    = DBInterface.list_to_sql(data_find.keys(), setter=True)
         params  = list(data_new.values())
         params.extend(list(data_find.values()))
-        sql     = 'UPDATE {} SET {} WHERE {}'.format(table, columns, cond)
+        sql     = 'UPDATE `{}` SET {} WHERE {}'.format(table, columns, cond)
+
+        return self.cursor.execute(sql, params)
+
+    def delete_by(self, table, data_find):
+        cond   = DBInterface.list_to_sql(data_find.keys(), setter=True)
+        params = list(data_find.values())
+        sql    = 'DELETE FROM `{}` WHERE {}'.format(table, cond)
 
         return self.cursor.execute(sql, params)
 
@@ -70,11 +87,18 @@ class DBInterface():
     def set_by_id(self, table, id_, data_new):
         if len(self.get_by_id(table, id_, ['id'])) == 0:
             self.insert_id(table, id_)
-            print('inserted')
 
         return self.set_by(table, {'id': id_}, data_new)
 
-    def insert_id(self, table, id_):
-        sql = 'INSERT INTO {}(`id`) VALUES (?)'.format(table)
+    def delete_by_id(self, table, id_):
+        return self.delete_by(table, {'id': id_})
 
-        return self.cursor.execute(sql, (id_,))
+    def insert(self, table, id_, data_new={}):
+        data_new['id'] = id_
+        columns        = DBInterface.list_to_sql(data_new.keys())
+        values         = DBInterface.list_to_sql_vars(data_new.keys())
+        params         = list(data_new.values())
+        sql            = 'INSERT INTO `{}`({}) VALUES ({})'.format(table, columns, values)
+
+        return self.cursor.execute(sql, params)
+
