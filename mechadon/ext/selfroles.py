@@ -38,7 +38,8 @@ class SelfRoles:
         
         await self.bot.reply(fmt.format(asked_role))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['selfroles',
+    'roles'])
     async def selfroleslist(self, context):
         server = context.message.server
         roles  = []
