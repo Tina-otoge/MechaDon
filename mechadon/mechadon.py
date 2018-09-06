@@ -29,3 +29,7 @@ class MechaDon(commands.Bot):
 
     def db_interface(self):
         return DBInterface(self.db_path)
+
+    def on_message(self, message):
+        if message.content and message.content != message.content[0] * len(message.content):
+            yield from self.process_commands(message)
