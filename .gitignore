@@ -1,3 +1,7 @@
+# Python virtual environment
+/.venv
+/venv
+
 # DB
 *.db
 

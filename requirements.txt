@@ -1,0 +1,2 @@
+sqlalchemy
+-e git+git://github.com/b1naryth1ef/disco#egg=disco-py
