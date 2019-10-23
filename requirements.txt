@@ -1,0 +1,3 @@
+python-dateutil
+discord.py
+iteration_utilities
