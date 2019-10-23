@@ -24,7 +24,7 @@ class Stickers(commands.Cog):
         try:
             with open(self.path) as f:
                 self.stickers = json.load(f)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, FileNotFoundError):
             self.initialize_stickers()
 
     def initialize_stickers(self):
