@@ -84,7 +84,7 @@ class DBInterface():
         if asc:
             sql += 'ORDER BY {} ASC'.format(asc)
         if desc:
-            sql += 'ORDERY BY {} DESC'.format(desc)
+            sql += 'ORDER BY {} DESC'.format(desc)
         self.cursor.execute(sql, search)
         return self.cursor.fetchall()
 
