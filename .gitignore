@@ -2,8 +2,9 @@
 /.venv/
 /venv/
 
-# DB
-*.db
+# Generated files
+/MechaDon.db
+/stickers.json
 
 # Config
 /config.py
