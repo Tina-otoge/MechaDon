@@ -21,16 +21,16 @@ class SelfRoles(commands.Cog):
         if role not in server.roles:
             self.complain_not_exists(role)
         with self.bot.db() as db:
-            if len(db.get('selfroles', asked_role.id)) == 0:
+            if len(db.get('selfroles', role.id)) == 0:
                 raise Exception('The role {} is not self-assignable'.format(
                     role))
-        if asked_role not in user.roles:
-            await self.bot.add_roles(user, asked_role)
+        if role not in user.roles:
+            await user.add_roles(role)
             fmt = 'I added you the {} role da-don~'
         else:
-            await self.bot.remove_roles(user, asked_role)
+            await user.remove_roles(role)
             fmt = 'as you requested, you no longer have the {} role da-don...'
-        await context.send(fmt.format(asked_role))
+        await context.send(fmt.format(role))
 
     @commands.command(name='roles')
     @commands.guild_only()
@@ -56,15 +56,15 @@ class SelfRoles(commands.Cog):
         if role not in server.roles:
             self.complain_not_exists(role)
         with self.bot.db() as db:
-            if len(db.get('selfroles', asked_role.id)) > 0:
-                db.delete('selfroles', asked_role.id)
+            if len(db.get('selfroles', role.id)) > 0:
+                db.delete('selfroles', role.id)
                 fmt = 'Removed {} from selfroles'
             else:
-                db.insert('selfroles', {'id': asked_role.id, 'server_id': server.id})
+                db.insert('selfroles', {'id': role.id, 'server_id': server.id})
                 fmt = 'Added {} to selfroles'
             db.commit()
 
-        await context.send(fmt.format(asked_role))
+        await context.send(fmt.format(role))
 
     @commands.command(name='rolesclean')
     @is_admin()
