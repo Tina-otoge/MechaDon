@@ -17,7 +17,7 @@ class Info(commands.Cog):
         ))
 
     @commands.command()
-    async def created(self, context, *, user: discord.user = None):
+    async def created(self, context, *, user: discord.User = None):
         target = user or context.author
         await context.send(
             '{0.display_name}\'s account was created on {1}'.format(
