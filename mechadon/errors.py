@@ -1,0 +1,2 @@
+class ThinkingError(Exception):
+    pass

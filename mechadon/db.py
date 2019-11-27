@@ -80,11 +80,13 @@ class DBInterface():
             sql += ' WHERE {}'.format(
                 dict_to_sql(search, setter=True, where=True)
             )
-            search = tuple(deepflatten(search.values()))
+            search = tuple(deepflatten(search.values(), types=list))
         if asc:
             sql += 'ORDER BY {} ASC'.format(asc)
         if desc:
             sql += 'ORDER BY {} DESC'.format(desc)
+        print('sql: ', sql)
+        print(search)
         self.cursor.execute(sql, search)
         return self.cursor.fetchall()
 

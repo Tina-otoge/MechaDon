@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 
 from mechadon.embed import MechaEmbed
+from mechadon.errors import ThinkingError
 
 class ErrorHandler(commands.Cog):
     def __init__(self, bot):
@@ -15,7 +16,8 @@ class ErrorHandler(commands.Cog):
         if isinstance(exception, commands.errors.CommandInvokeError):
             exception = exception.original
         if isinstance(exception, (
-                commands.errors.CommandNotFound
+            commands.errors.CommandNotFound,
+            ThinkingError
         )):
             logging.info('Ignoring exception: ' + str(exception))
             await context.message.add_reaction('🤔')
