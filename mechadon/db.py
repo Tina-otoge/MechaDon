@@ -109,10 +109,11 @@ class DBInterface():
         return self.cursor.fetchall()
 
     def set(self, table, search, new):
-        if len(self.get(table, search)) == 0:
-            return self.insert(table, new)
         if not isinstance(search, dict):
             search = {'id': search}
+        if len(self.get(table, search)) == 0:
+            search.update(new)
+            return self.insert(table, search)
         columns = list_to_sql(new.keys(), setter=True)
         cond    = list_to_sql(search.keys(), setter=True, where=True)
         params  = list(new.values())
