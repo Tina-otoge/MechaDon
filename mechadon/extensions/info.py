@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from .string import listify
 from .time import TIME_FRONT
 from mechadon.embed import MechaEmbed
 
@@ -25,6 +26,17 @@ class Info(commands.Cog):
                 target, target.created_at.strftime(TIME_FRONT)
             )
         )
+
+    @commands.command()
+    @commands.guild_only()
+    async def server(self, context):
+        await context.send(embed=MechaEmbed(
+            title=context.guild.name,
+            description=listify([
+                'ID: {}'.format(context.guild.id)
+            ]),
+            context=context
+        ))
 
     @commands.command()
     @commands.guild_only()
