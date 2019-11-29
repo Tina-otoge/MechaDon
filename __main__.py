@@ -1,7 +1,7 @@
 import logging
 
 from mechadon.bot import MechaDon
-import config
+from config import config
 
 logging.basicConfig(level=logging.INFO)
 

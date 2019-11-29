@@ -11,7 +11,7 @@ class MechaDon(commands.Bot):
 
     def __init__(self, config):
         self.config = config
-        self.db_path = config.db_path
+        self.db_path = self.config.get('db_path', 'MechaDon.db')
 
         super().__init__(command_prefix=commands.when_mentioned_or('!'))
 
@@ -22,7 +22,12 @@ class MechaDon(commands.Bot):
             with self.db() as db:
                 db.execute(f.read())
 
-        self.run(config.token)
+        self.run(config.get('token'))
+
+    def config_loads(self, defaults={}, as_schema=False):
+        if as_schema:
+            return {k:self.config.get(k, defaults[k]) for k in defaults}
+        return defaults.update(self.config)
 
     async def on_ready(self):
         logging.info('Bot {0.name}#{0.discriminator} ({0.id})'.format(self.user))

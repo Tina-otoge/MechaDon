@@ -1,4 +1,5 @@
 import sqlite3
+import logging
 
 from iteration_utilities import deepflatten
 
@@ -23,18 +24,22 @@ def dict_to_sql(d, setter=False, where=False):
         'list': ' IN (?)',
     }
     seperator = ' and ' if where else ', '
-    if setter:
-        format += '{}'
-        result = []
-        for k in d:
+    if not setter:
+        return seperator.join([format.format(k) for k in d])
+    format += '{}'
+    result = []
+    for k in d:
+        try:
+            if issubclass(d[k], DBCommand):
+                result.append('`{}` {}'.format(k, d[k].sql()))
+        except TypeError as e:
             if isinstance(d[k], list):
                 result.append('`{}` IN ({})'.format(
                     k, ', '.join(['?'] * len(d[k]))
                 ))
             else:
                 result.append('`{}`=?'.format(k))
-        return seperator.join(result)
-    return seperator.join([format.format(k) for k in d])
+    return seperator.join(result)
 
 class DebugRow(sqlite3.Row):
     def __repr__(self):
@@ -42,6 +47,20 @@ class DebugRow(sqlite3.Row):
         for key in self.keys():
             key_values.append('\'{}\': {}'.format(key, str(self[key])))
         return '<DebugRow: {{{}}}>'.format(', '.join(key_values))
+
+class DBCommand:
+    def sql():
+        return None
+
+class NotEmpty(DBCommand):
+    def sql():
+        return 'IS NOT NULL'
+
+def commands_filter(item):
+    try:
+        return not issubclass(item, DBCommand)
+    except TypeError:
+        return True
 
 class DBInterface():
 
@@ -80,13 +99,12 @@ class DBInterface():
             sql += ' WHERE {}'.format(
                 dict_to_sql(search, setter=True, where=True)
             )
-            search = tuple(deepflatten(search.values(), types=list))
+            search = list(filter(commands_filter, search.values()))
+            search = tuple(deepflatten(search, types=list))
         if asc:
             sql += 'ORDER BY {} ASC'.format(asc)
         if desc:
             sql += 'ORDER BY {} DESC'.format(desc)
-        print('sql: ', sql)
-        print(search)
         self.cursor.execute(sql, search)
         return self.cursor.fetchall()
 
@@ -115,6 +133,5 @@ class DBInterface():
         values         = list_to_sql_vars(data.keys())
         params         = list(data.values())
         sql            = 'INSERT INTO `{}`({}) VALUES ({})'.format(table, columns, values)
-        print(sql)
         return self.cursor.execute(sql, params)
 

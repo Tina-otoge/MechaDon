@@ -7,8 +7,7 @@ class MechaEmbed(Embed):
 
         if 'context' in kwargs:
             text = '{0.cog.qualified_name} / {0.command.name}'.format(kwargs['context'])
-        else:
-            text = ''
+        text = kwargs.get('footer', ' ')
         icon_url = 'https://cdn.discordapp.com/emojis/477980675434348554.png?v=1'
         self.set_footer(text=text, icon_url=icon_url)
 
