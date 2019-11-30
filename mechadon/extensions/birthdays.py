@@ -57,6 +57,8 @@ class Birthdays(commands.Cog):
                     discord.utils.get(server.members, id=e['id'])
                     for e in today_bdays
                 ]
+                if len(server_bdays) is 0:
+                    continue
                 await channel.send(embed=MechaEmbed(
                     title='Today\'s birthdays! 🎉',
                     description=listify(server_bdays),
